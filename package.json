@@ -1,6 +1,6 @@
 {
   "name": "sse-sync",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "SSE-based data sync for Koa and the browser",
   "license": "MIT",
   "type": "module",
