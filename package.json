@@ -1,11 +1,13 @@
 {
   "name": "sse-sync",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "SSE-based data sync for Koa and the browser",
   "license": "MIT",
   "type": "module",
-  "main": "./dist/server/index.cjs",
-  "module": "./dist/server/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tellip/sse-sync.git"
+  },
   "exports": {
     "./server": {
       "import": "./dist/server/index.js",
