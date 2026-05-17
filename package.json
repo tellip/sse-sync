@@ -1,0 +1,40 @@
+{
+  "name": "sse-sync",
+  "version": "0.1.0",
+  "description": "SSE-based data sync for Koa and the browser",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/server/index.cjs",
+  "module": "./dist/server/index.js",
+  "exports": {
+    "./server": {
+      "import": "./dist/server/index.js",
+      "require": "./dist/server/index.cjs"
+    },
+    "./client": {
+      "import": "./dist/client/index.js",
+      "require": "./dist/client/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "koa": "^3.2.0"
+  },
+  "peerDependenciesMeta": {
+    "koa": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "rollup": "^4.60.4"
+  }
+}
