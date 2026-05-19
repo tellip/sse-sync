@@ -28,15 +28,13 @@ export function createSyncServer({
                 keepAlive: heartbeatInterval,
             });
             sessions.set(session, res);
-            session.on('disconnected', () => {
-                sessions.delete(session);
-            });
+            session.on('disconnected', () => sessions.delete(session));
 
             try {
-                session.push({type: 'full', data: await getFullData(req, res)})
+                session.push(await getFullData(req, res), 'full');
             } catch (err) {
                 try {
-                    session.push({message: err instanceof Error ? err.message : 'Internal server error'}, 'server-error');
+                    session.push(err instanceof Error ? err.message : 'Internal server error', 'server-error');
                 } finally {
                     res.end()
                 }
@@ -45,7 +43,7 @@ export function createSyncServer({
 
         broadcast(data, {exclude} = {}) {
             for (const [session, res] of [...sessions]) if (session !== exclude) try {
-                session.push({type: 'increment', data})
+                session.push(data, 'increment');
             } catch (_) {
                 res.end()
             }

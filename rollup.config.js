@@ -10,7 +10,7 @@ export default [
     {
         input: 'src/client.js',
         output: {file: 'dist/client.js', format: 'esm', sourcemap: true},
-        external: ['sse.js'],
+        external: ['tiny-invariant', '@microsoft/fetch-event-source'],
         plugins: [resolve()],
     }
 ];
