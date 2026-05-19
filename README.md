@@ -17,7 +17,7 @@ import http from 'http';
 import { createSyncServer } from 'sse-sync/server';
 
 const sse = createSyncServer({
-  getFullData: async (req, res) => ({ message: 'Hello' }),
+  getSnapshot: async (req, res) => ({ message: 'Hello' }),
 });
 
 const server = http.createServer((req, res) => {
@@ -30,7 +30,7 @@ const server = http.createServer((req, res) => {
 
 server.listen(3000);
 
-// Broadcast incremental updates
+// Broadcast an update
 sse.broadcast({ message: 'update' });
 ```
 
@@ -44,8 +44,8 @@ import { fetchSyncSource } from 'sse-sync/client';
 const controller = new AbortController();
 
 fetchSyncSource('/sse', {
-  onFull: (data) => console.log('Initial data:', data),
-  onIncrement: (data) => console.log('Update:', data),
+  onSnapshot: (data) => console.log('Initial state:', data),
+  onUpdate: (data) => console.log('Update:', data),
   signal: controller.signal,
 });
 
@@ -56,27 +56,28 @@ fetchSyncSource('/sse', {
 
 ### Server: `createSyncServer(options)`
 
-- `options.getFullData(req, res)` – async function, returns the initial dataset.
+- `options.getSnapshot(req, res)` – async function, returns the snapshot of the current state when a client connects.
 - `options.heartbeatInterval` (default `15000`) – ms between heartbeats.
 - `options.maxClients` (default `0` = unlimited)
 - Returns `{ handler, broadcast, disconnect, clientCount }`.
-    - `handler(req, res)` – native Node.js HTTP request handler (async).
-    - `broadcast(data, { exclude? })` – push incremental update to all connected clients.
-    - `disconnect()` – close all client connections.
-    - `clientCount` – number of currently connected clients.
+  - `handler(req, res)` – native Node.js HTTP request handler (async).
+  - `broadcast(data, { exclude? })` – push an update to all connected clients.
+  - `disconnect()` – close all client connections.
+  - `clientCount` – number of currently connected clients.
 
 ### Client: `fetchSyncSource(url, options)`
 
 Wraps [@microsoft/fetch-event-source](https://github.com/Azure/fetch-event-source). Returns the underlying `Promise` (resolves when the connection closes cleanly).
 
-- `options.onFull(data)` / `onIncrement(data)` – called for `full` and `increment` events.
+- `options.onSnapshot(data)` – called when the initial snapshot is received.
+- `options.onUpdate(data)` – called for each subsequent update.
 - Any option supported by `fetchEventSource` can be passed through (e.g. `signal`, `headers`, `onopen`, `onclose`, `onerror`).
 - Use an `AbortController` (`options.signal`) to disconnect.
 
 ## Protocol
 
-- `full` – initial dataset sent on connection.
-- `increment` – incremental updates broadcast by server.
+- `snapshot` – a snapshot of the current state sent when a client connects.
+- `update` – an incremental update broadcast by the server.
 - `server-error` – custom event for server-side errors.
 
 ## License

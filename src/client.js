@@ -1,10 +1,10 @@
 import invariant from 'tiny-invariant'
 import {fetchEventSource} from "@microsoft/fetch-event-source";
 
-export function fetchSyncSource(url, {onFull, onIncrement, ...rest} = {}) {
+export function fetchSyncSource(url, {onSnapshot, onUpdate, ...rest} = {}) {
     invariant(
-        (!onFull || typeof onFull === 'function') &&
-        (!onIncrement || typeof onIncrement === 'function'),
+        (!onSnapshot || typeof onSnapshot === 'function') &&
+        (!onUpdate || typeof onUpdate === 'function'),
         'Invalid parameters for createSyncServer'
     )
 
@@ -14,7 +14,7 @@ export function fetchSyncSource(url, {onFull, onIncrement, ...rest} = {}) {
             try {
                 if (ev.event === 'server-error') rest.onerror?.(new Error(JSON.parse(ev.data)));
                 else {
-                    const fn = {full: onFull, increment: onIncrement}[ev.event];
+                    const fn = {snapshot: onSnapshot, update: onUpdate}[ev.event];
                     if (fn) fn(JSON.parse(ev.data))
                     else rest.onmessage?.(ev);
                 }

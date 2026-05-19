@@ -2,12 +2,12 @@ import assert from 'assert';
 import {createSession} from 'better-sse';
 
 export function createSyncServer({
-    getFullData,
+    getSnapshot,
     heartbeatInterval = 15000,
     maxClients = 0,
 } = {}) {
     assert(
-        typeof getFullData === 'function' &&
+        typeof getSnapshot === 'function' &&
         Number.isInteger(heartbeatInterval) && heartbeatInterval >= 1000 &&
         Number.isInteger(maxClients) && maxClients >= 0,
         'Invalid parameters for createSyncServer'
@@ -31,7 +31,7 @@ export function createSyncServer({
             session.on('disconnected', () => sessions.delete(session));
 
             try {
-                session.push(await getFullData(req, res), 'full');
+                session.push(await getSnapshot(req, res), 'snapshot');
             } catch (err) {
                 try {
                     session.push(err instanceof Error ? err.message : 'Internal server error', 'server-error');
@@ -43,7 +43,7 @@ export function createSyncServer({
 
         broadcast(data, {exclude} = {}) {
             for (const [session, res] of [...sessions]) if (session !== exclude) try {
-                session.push(data, 'increment');
+                session.push(data, 'update');
             } catch (_) {
                 res.end()
             }
