@@ -1,6 +1,6 @@
 {
   "name": "sse-sync",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "SSE-based data sync for Node.js HTTP servers and the browser",
   "exports": {
     "./server": "./dist/server.js",
